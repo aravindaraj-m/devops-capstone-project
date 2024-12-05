@@ -17,7 +17,7 @@ echo "Loading configuration from $BUILD_CONFIG_FILE..."
 source "$BUILD_CONFIG_FILE"
 
 # Check required variables
-REQUIRED_VARS=("IMAGE_TAG" "DOCKERFILE_PATH" "CONTEXT_PATH" "DOCKER_USERNAME" "DOCKER_REPO" "DOCKERHUB_TOKEN")
+REQUIRED_VARS=("IMAGE_TAG" "DOCKERFILE_PATH" "CONTEXT_PATH" "DOCKER_USERNAME" "DOCKER_REPO")
 for var in "${REQUIRED_VARS[@]}"; do
   if [ -z "${!var}" ]; then
     echo "Error: Required variable $var is not set in $BUILD_CONFIG_FILE!"
@@ -38,12 +38,6 @@ fi
 #check if dockerfile exists
 if [ ! -f "$DOCKERFILE_PATH" ]; then
   echo "Error: Dockerfile not found at $DOCKERFILE_PATH"
-  exit 1
-fi
-
-#check if docker credentials file exists
-if [ ! -f "$DOCKERHUB_TOKEN" ]; then
-  echo "Error: Credentials file not found at $DOCKERHUB_TOKEN"
   exit 1
 fi
 

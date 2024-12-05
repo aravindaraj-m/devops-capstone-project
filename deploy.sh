@@ -14,7 +14,7 @@ echo "Loading configuration from $DEPLOY_CONFIG_FILE..."
 source "$DEPLOY_CONFIG_FILE"
 
 # Check required variables
-REQUIRED_VARS=("EC2_USER" "EC2_HOST" "DOCKER_COMPOSE_FILE" "NGINX_CONF" "PROM_YML" "REMOTE_DIR" "PEM_FILE" "DOCKER_USERNAME" "DOCKERHUB_TOKEN")
+REQUIRED_VARS=("EC2_USER" "EC2_HOST" "DOCKER_COMPOSE_FILE" "NGINX_CONF" "PROM_YML" "REMOTE_DIR" "DOCKER_USERNAME")
 for var in "${REQUIRED_VARS[@]}"; do
   if [ -z "${!var}" ]; then
     echo "Error: Required variable $var is not set in $DEPLOY_CONFIG_FILE!"
@@ -42,18 +42,6 @@ fi
 #check if prometheus.yml file exists
 if [ ! -f "$PROM_YML" ]; then
   echo "Error: $PROM_YML not found!"
-  exit 1
-fi
-
-#check pem file exists
-if [ ! -f "$PEM_FILE" ]; then
-  echo "Error: $PEM_FILE not found!"
-  exit 1
-fi
-
-#check docker credentials file exists
-if [ ! -f "$DOCKERHUB_TOKEN" ]; then
-  echo "Error: $DOCKERHUB_TOKEN not found!"
   exit 1
 fi
 
