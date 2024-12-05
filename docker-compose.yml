@@ -1,0 +1,31 @@
+version: '2.31.0'
+services:
+  capstone_project:
+    image: aravindmathes/dev:0.1
+    ports:
+      - 8080:80
+    volumes:
+      - ./dependencies/nginx.conf:/etc/nginx/nginx.conf:ro
+
+  nginx-exporter:
+    image: nginx/nginx-prometheus-exporter:latest
+    ports:
+      - 9113:9113
+    command:
+      - -nginx.scrape-uri=http://localhost:80/stub_status
+    depends_on:
+      - capstone_project
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - 9090:9090
+    volumes:
+      - ./dependencies/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - 3000:3000
+    depends_on:
+      - prometheus
