@@ -23,3 +23,8 @@ else
 fi
 
 echo "Updated $CONFIG_FILE with IMAGE_TAG=$IMAGE_TAG"
+
+######################################################################
+#Add this file to Jenins Pipeline Job Stage
+#use this cmd when executing "./image_tag.sh $BUILD_NUMBER"
+######################################################################
