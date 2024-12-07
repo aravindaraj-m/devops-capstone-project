@@ -4,7 +4,7 @@
 set -e
 
 # Configuration file
-BUILD_CONFIG_FILE="./configurations/config.txt"
+BUILD_CONFIG_FILE="./configurations/config.ini"
 
 # Check if the config file exists
 if [ ! -f "$BUILD_CONFIG_FILE" ]; then
@@ -17,7 +17,7 @@ echo "Loading configuration from $BUILD_CONFIG_FILE..."
 source "$BUILD_CONFIG_FILE"
 
 # Check required variables
-REQUIRED_VARS=("IMAGE_TAG" "DOCKERFILE_PATH" "CONTEXT_PATH" "DOCKER_USERNAME" "DOCKER_REPO" "DOCKERHUB_TOKEN")
+REQUIRED_VARS=("IMAGE_TAG" "DOCKERFILE_PATH" "CONTEXT_PATH" "DOCKER_USERNAME" "DOCKER_DEV_REPO" "DOCKERHUB_TOKEN")
 for var in "${REQUIRED_VARS[@]}"; do
   if [ -z "${!var}" ]; then
     echo "Error: Required variable $var is not set in $BUILD_CONFIG_FILE!"
@@ -27,7 +27,7 @@ for var in "${REQUIRED_VARS[@]}"; do
   fi
 done
 
-FULL_IMAGE_NAME="$DOCKER_USERNAME/$DOCKER_REPO:$IMAGE_TAG"
+FULL_IMAGE_NAME="$DOCKER_USERNAME/$DOCKER_DEV_REPO:$IMAGE_TAG"
 
 #check if docker is installed
 if ! [ -x "$(command -v docker)" ]; then
