@@ -63,6 +63,9 @@ echo "This Production Repository Image name --> $PROD_IMAGE"
 echo "All current docker images"
 docker images
 
+echo "Container"
+docker ps -a
+
 echo "Retag Dev Repo Docker Image to Prod Repo Dockker Image"
 docker tag "$DEV_IMAGE" "$PROD_IMAGE"
 
