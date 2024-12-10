@@ -1,0 +1,22 @@
+groups:
+  - name: container-alerts
+    rules:
+      # Alert for high CPU utilization
+      - alert: HighCPUUtilization
+        expr: rate(container_cpu_usage_seconds_total{name="capstone_project"}[1m]) > 0.5
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU utilization detected"
+          description: "The container capstone_project is using more than 50% CPU for the last minute."
+
+      # Alert for container down
+      - alert: ContainerDown
+        expr: absent(container_last_seen{name="capstone_project"})
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Container capstone_project is down"
+          description: "The container capstone_project has been down for more than 1 minute."
