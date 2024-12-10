@@ -58,16 +58,16 @@ if [ ! -f "$DOCKERFILE_PATH" ]; then
   exit 1
 fi
 
-echo "Stopping the Running Containers"
-docker ps -q | xargs -r docker stop
-sleep 4
-echo "Deleting the Containers"
-docker ps -aq | xargs -r docker rm
-sleep 3
-docker ps -a
-echo "Deleting all Docker Images."
-docker images -q | xargs -r docker rmi -f
-sleep 2
+# echo "Stopping the Running Containers"
+# docker ps -q | xargs -r docker stop
+# sleep 4
+# echo "Deleting the Containers"
+# docker ps -aq | xargs -r docker rm
+# sleep 3
+# docker ps -a
+# echo "Deleting all Docker Images."
+# docker images -q | xargs -r docker rmi -f
+# sleep 2
 
 #build the docker image
 echo "Building Docker image..."
