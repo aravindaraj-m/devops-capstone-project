@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Configuration file
-DEPLOY_CONFIG_FILE="./configurations/config.txt"
+DEPLOY_CONFIG_FILE="./configurations/config.ini"
 
 # Check if the config file exists
 if [ ! -f "$DEPLOY_CONFIG_FILE" ]; then
@@ -14,7 +14,7 @@ echo "Loading configuration from $DEPLOY_CONFIG_FILE..."
 source "$DEPLOY_CONFIG_FILE"
 
 # Check required variables
-REQUIRED_VARS=("EC2_USER" "EC2_HOST" "DOCKER_COMPOSE_FILE" "NGINX_CONF" "PROM_YML" "REMOTE_DIR" "DOCKER_USERNAME")
+REQUIRED_VARS=("DOCKER_COMPOSE_FILE" "NGINX_CONF" "PROM_YML" "IMAGE_TAG" "ALERT_RULES" "ALERT_MANAGER" "DOCKER_USERNAME" "DOCKER_DEV_REPO" "DOCKER_PROD_REPO")
 for var in "${REQUIRED_VARS[@]}"; do
   if [ -z "${!var}" ]; then
     echo "Error: Required variable $var is not set in $DEPLOY_CONFIG_FILE!"
@@ -23,9 +23,6 @@ for var in "${REQUIRED_VARS[@]}"; do
     echo "$var = ${!var}"
   fi
 done
-
-EC2_INSTANCE="$EC2_USER:$EC2_HOST"
-echo "$EC2_INSTANCE"
 
 #check if docker-compose.yml file exists
 if [ ! -f "$DOCKER_COMPOSE_FILE" ]; then
@@ -45,51 +42,47 @@ if [ ! -f "$PROM_YML" ]; then
   exit 1
 fi
 
-#deployement on EC2 Instance
-echo "Deploying to EC2 Instance - !@!$EC2_INSTANCE!@!"
+#check pem file exists
+if [ ! -f "$ALERT_RULES" ]; then
+  echo "Error: $ALERT_RULES not found!"
+  exit 1
+fi
 
-#login to EC2 Instance to stop running container and do clean up of old deployment files
-ssh -i "$PEM_FILE" "$EC2_USER@$EC2_HOST" << EOF
-  echo "Stopping and Deleting all the running Docker containers."
-  sudo docker ps -q | xargs -r docker stop
-  sudo docker ps -aq | xargs -r docker rm
-  echo "Deleting all Docker Images."
-  sudo docker images -q | xargs -r docker rmi
-  echo "Cleaning up old files in $REMOTE_DIR."
-  sudo rm -rf $REMOTE_DIR
-  echo "Recreating the directory $REMOTE_DIR."
-  mkdir -p $REMOTE_DIR
-  chmod 755 $REMOTE_DIR
-EOF
+#check docker credentials file exists
+if [ ! -f "$ALERT_MANAGER" ]; then
+  echo "Error: $ALERT_MANAGER not found!"
+  exit 1
+fi
 
-#copying the docker-compose and its dependent files to EC2 Instance
-echo "Copying Docker-compose and its dependencies to EC2 deployment directory."
-scp -i "$PEM_FILE" $DOCKER_COMPOSE_FILE "$EC2_USER@$EC2_HOST:$REMOTE_DIR"
-scp -i "$PEM_FILE" -r ./dependencies/ "$EC2_USER@$EC2_HOST:$REMOTE_DIR"
-echo "copied Docker-compose.yml and its dependencies in $REMOTE_DIR"
+DEV_IMAGE="$DOCKER_USERNAME/$DOCKER_DEV_REPO:$IMAGE_TAG"
+PROD_IMAGE="$DOCKER_USERNAME/$DOCKER_PROD_REPO:$IMAGE_TAG"
 
-#execute docker-compose.yml file in EC2 Instance
-echo "Starting Deployment in EC2 instance at $EC2_HOST."
-ssh -i "$PEM_FILE" "$EC2_USER@$EC2_HOST" << EOF
-  echo "Changing to $REMOTE_DIR directory."
-  cd $REMOTE_DIR
-  echo "Login to Docker Hub"
-  cat "$DOCKERHUB_TOKEN" | docker login -username "$DOCKER_USERNAME" --password-stdin
-  if [ $? -ne 0 ]; then
-    echo "Error: Docker login failed!"
-    exit 1
-  fi
-  echo "Running Docker compose to start container"
-  sudo docker-compose up -d
-  echo "Deployment completed Successfully in $EC2_HOST!"
-  sleep 3
-  echo "!@!  All Docker Images  !@!"
-  sudo docker images
-  echo "!@!  All Running Docker Containers  !@!"
-  sudo docker ps -a
-  echo "Logout from Docker Hub"
-  sudo docker logout
-EOF
+echo "This Development repository Docker Image name --> $DEV_IMAGE"
+echo "This Production Repository Image name --> $PROD_IMAGE"
 
-# #scp -i "$PEM_FILE" docker-compose.yml "$EC2_USER@$EC2_HOST:/home/$EC2_USER/" --> remove {-i "$PEM_FILE"} to use jenkins global credentials
-# #ssh -i "$PEM_FILE" "$EC2_USER@$EC2_HOST" --> remove {-i "$PEM_FILE"} to use jenkins global credentials
+echo "All current docker images"
+docker images
+
+echo "Retag Dev Repo Docker Image to Prod Repo Dockker Image"
+docker tag "$DEV_IMAGE" "$PROD_IMAGE"
+
+echo "Login to Docker Hub"
+echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKER_USERNAME" --password-stdin
+if [ $? -ne 0 ]; then
+  echo "Error: Docker login failed!"
+  exit 1
+fi
+echo "Push Prod Image to Docker Repo"
+docker push "$PROD_IMAGE"
+sleep 5
+docker logout
+#using DOCKER_IMAGE as variable to send image name and tag as arugument to docker-compose file 
+# echo "Running Docker compose from production image to start container"
+# DOCKER_IMAGE="$DOCKER_USERNAME/$DOCKER_PROD_REPO:$IMAGE_TAG" docker-compose up -d
+# echo "Deployment completed Successfully in $EC2_HOST!"
+# sleep 3
+# echo "!@!  All Docker Images  !@!"
+# docker images
+# echo "!@!  All Running Docker Containers  !@!"
+# docker ps -a
+# echo "Logout from Docker Hub"
