@@ -1,0 +1,18 @@
+global:
+  smtp_smarthost: 'smtp.gmail.com:587'
+  smtp_from: 'aravinddevopslearning@gmail.com'
+  smtp_auth_username: 'aravinddevopslearning@gmail.com'
+  smtp_auth_password: 'daaf pwrp egci esiq' # Use an app password for Gmail
+  smtp_require_tls: true
+
+route:
+  group_by: ['alertname']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 1h
+  receiver: 'email-notifications'
+
+receivers:
+  - name: 'email-notifications'
+    email_configs:
+      - to: 'aravinddevopslearning@gmail.com'
