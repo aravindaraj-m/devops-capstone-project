@@ -48,7 +48,7 @@ services:
   alertmanager:
     image: prom/alertmanager:latest
     ports:
-      - 9094:9093
+      - 9093:9093
     volumes:
       - ./dependencies/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
     command:
