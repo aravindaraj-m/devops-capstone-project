@@ -60,10 +60,10 @@ fi
 
 echo "Stopping the Running Containers"
 docker ps -q | xargs -r docker stop
-sleep 2
+sleep 4
 echo "Deleting the Containers"
 docker ps -aq | xargs -r docker rm
-sleep 2
+sleep 3
 docker ps -a
 echo "Deleting all Docker Images."
 docker images -q | xargs -r docker rmi -f
