@@ -78,6 +78,7 @@ fi
 echo "Push Prod Image to Docker Repo"
 docker push "$PROD_IMAGE"
 sleep 5
+docker logout
 #using DOCKER_IMAGE as variable to send image name and tag as arugument to docker-compose file 
 # echo "Running Docker compose from production image to start container"
 # DOCKER_IMAGE="$DOCKER_USERNAME/$DOCKER_PROD_REPO:$IMAGE_TAG" docker-compose up -d
@@ -88,7 +89,7 @@ sleep 5
 # echo "!@!  All Running Docker Containers  !@!"
 # docker ps -a
 # echo "Logout from Docker Hub"
-docker logout
+
 
 #deployement on EC2 Instance
 # echo "Deploying to EC2 Instance - !@!$EC2_INSTANCE!@!"
