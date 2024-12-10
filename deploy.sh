@@ -75,6 +75,7 @@ fi
 echo "Push Prod Image to Docker Repo"
 docker push "$PROD_IMAGE"
 sleep 5
+echo "Log Out of Docker"
 docker logout
 #using DOCKER_IMAGE as variable to send image name and tag as arugument to docker-compose file 
 # echo "Running Docker compose from production image to start container"
