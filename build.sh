@@ -3,10 +3,9 @@
 # Exit on any error
 set -e
 
-<<<<<<< HEAD
 # Configuration file
 BUILD_CONFIG_FILE="./configurations/config.txt"
-=======
+
 # Check if image tag is provided from Jenkins Build Number
 if [ -z "$1" ]; then
   echo "Error: Image tag argument is missing."
@@ -15,18 +14,12 @@ fi
 
 IMAGE_TAG=$1
 
-# Configuration file
-BUILD_CONFIG_FILE="./configurations/config.ini"
->>>>>>> dev
-
 # Check if the config file exists
 if [ ! -f "$BUILD_CONFIG_FILE" ]; then
   echo "Error: Configuration file $BUILD_CONFIG_FILE not found!"
   exit 1
 fi
 
-<<<<<<< HEAD
-=======
 # Add or update the image tag with jenkins build number
 if grep -q "IMAGE_TAG" "$BUILD_CONFIG_FILE"; then
   sed -i "s/^IMAGE_TAG=.*/IMAGE_TAG=$IMAGE_TAG/" "$BUILD_CONFIG_FILE"
@@ -36,17 +29,12 @@ fi
 
 echo "Updated $BUILD_CONFIG_FILE with IMAGE_TAG=$IMAGE_TAG"
 
->>>>>>> dev
 # Load variables from the config file
 echo "Loading configuration from $BUILD_CONFIG_FILE..."
 source "$BUILD_CONFIG_FILE"
 
 # Check required variables
-<<<<<<< HEAD
-REQUIRED_VARS=("IMAGE_TAG" "DOCKERFILE_PATH" "CONTEXT_PATH" "DOCKER_USERNAME" "DOCKER_REPO")
-=======
 REQUIRED_VARS=("IMAGE_TAG" "DOCKERFILE_PATH" "CONTEXT_PATH" "DOCKER_USERNAME" "DOCKER_DEV_REPO")
->>>>>>> dev
 for var in "${REQUIRED_VARS[@]}"; do
   if [ -z "${!var}" ]; then
     echo "Error: Required variable $var is not set in $BUILD_CONFIG_FILE!"
@@ -56,11 +44,7 @@ for var in "${REQUIRED_VARS[@]}"; do
   fi
 done
 
-<<<<<<< HEAD
-FULL_IMAGE_NAME="$DOCKER_USERNAME/$DOCKER_REPO:$IMAGE_TAG"
-=======
 DEV_IMAGE_NAME="$DOCKER_USERNAME/$DOCKER_DEV_REPO:$IMAGE_TAG"
->>>>>>> dev
 
 #check if docker is installed
 if ! [ -x "$(command -v docker)" ]; then
@@ -76,19 +60,11 @@ fi
 
 #build the docker image
 echo "Building Docker image..."
-<<<<<<< HEAD
-docker build -t "$FULL_IMAGE_NAME" -f "$DOCKERFILE_PATH" "$CONTEXT_PATH"
-
-#check if the build was successful
-if [ $? -eq 0 ]; then
-  echo "Docker image $FULL_IMAGE_NAME built successfully."
-=======
 docker build -t "$DEV_IMAGE_NAME" -f "$DOCKERFILE_PATH" "$CONTEXT_PATH"
 
 #check if the build was successful
 if [ $? -eq 0 ]; then
   echo "Docker image $DEV_IMAGE_NAME built successfully."
->>>>>>> dev
 else
   echo "Error: Failed to build Docker image."
   exit 1
@@ -96,29 +72,16 @@ fi
 
 #login into docker hub with docker credentials
 echo "logining into docker hub..."
-<<<<<<< HEAD
-cat "$DOCKERHUB_TOKEN" | docker login -u "$DOCKER_USERNAME" --password-stdin
-
-#push image to docker hub
-echo "Pushing image to Docker Hub..."
-docker push "$FULL_IMAGE_NAME"
-
-#verify the image push
-echo "Verifying if the image was pushed to Docker Hub..."
-if docker manifest inspect "$FULL_IMAGE_NAME" &>/dev/null; then
-  echo "Docker image $FULL_IMAGE_NAME has been successfully pushed to Docker Hub"
-=======
 echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
 #push image to docker hub
 echo "Pushing image to Docker Hub..."
-docker push "$FDEV_IMAGE_NAME"
+docker push "$DEV_IMAGE_NAME"
 
 #verify the image push
 echo "Verifying if the image was pushed to Docker Hub..."
 if docker manifest inspect "$DEV_IMAGE_NAME" &>/dev/null; then
   echo "Docker image $DEV_IMAGE_NAME has been successfully pushed to Docker Hub"
->>>>>>> dev
 else
   echo "Error: Failed to verify the image on Docker Hub. Please check your Docker Hub repository."
   exit 1

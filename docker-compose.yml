@@ -1,11 +1,7 @@
 version: '2.31.0'
 services:
   capstone_project:
-<<<<<<< HEAD
-    image: aravindmathes/dev:0.1
-=======
     image: ${DOCKER_IMAGE}
->>>>>>> dev
     ports:
       - 8080:80
     volumes:
@@ -20,8 +16,6 @@ services:
     depends_on:
       - capstone_project
 
-<<<<<<< HEAD
-=======
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
     ports:
@@ -33,29 +27,22 @@ services:
       - /sys:/sys:ro
       - /:/rootfs:ro
 
->>>>>>> dev
   prometheus:
     image: prom/prometheus:latest
     ports:
       - 9090:9090
     volumes:
       - ./dependencies/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-<<<<<<< HEAD
-=======
       - ./dependencies/alert.rules.yml:/etc/prometheus/alert.rules.yml:ro
     depends_on:
       - alertmanager
       - cadvisor
->>>>>>> dev
 
   grafana:
     image: grafana/grafana:latest
     ports:
       - 3000:3000
     depends_on:
-<<<<<<< HEAD
-      - prometheus
-=======
       - prometheus
   
   alertmanager:
@@ -66,4 +53,3 @@ services:
       - ./dependencies/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
     command:
       - --config.file=/etc/alertmanager/alertmanager.yml
->>>>>>> dev
