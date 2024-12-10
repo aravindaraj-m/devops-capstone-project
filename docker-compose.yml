@@ -3,7 +3,7 @@ services:
   capstone_project:
     image: ${DOCKER_IMAGE}
     ports:
-      - 8085:80
+      - 8082:80
     volumes:
       - ./dependencies/nginx.conf:/etc/nginx/nginx.conf:ro
 
@@ -48,7 +48,7 @@ services:
   alertmanager:
     image: prom/alertmanager:latest
     ports:
-      - 9093:9093
+      - 9094:9093
     volumes:
       - ./dependencies/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
     command:
