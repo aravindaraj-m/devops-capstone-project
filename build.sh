@@ -4,7 +4,7 @@
 set -e
 
 # Configuration file
-BUILD_CONFIG_FILE="./configurations/config.txt"
+BUILD_CONFIG_FILE="./configurations/config.ini"
 
 # Check if image tag is provided from Jenkins Build Number
 if [ -z "$1" ]; then
